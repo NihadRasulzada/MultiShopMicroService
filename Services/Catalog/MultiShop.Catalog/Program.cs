@@ -19,9 +19,9 @@ builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
 builder.Services.Configure<DatabaseSettings>(builder.Configuration.GetSection(nameof(DatabaseSettings)));
 
-builder.Services.AddScoped<IDatabaseSettings>(sp => 
+builder.Services.AddScoped<IDatabaseSettings>(sp =>
 {
-   return sp.GetRequiredService<IOptions<DatabaseSettings>>().Value;
+    return sp.GetRequiredService<IOptions<DatabaseSettings>>().Value;
 });
 
 builder.Services.AddControllers();
