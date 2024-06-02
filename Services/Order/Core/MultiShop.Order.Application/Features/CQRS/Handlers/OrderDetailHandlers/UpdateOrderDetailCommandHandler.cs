@@ -17,7 +17,7 @@ namespace MultiShop.Order.Application.Features.CQRS.Handlers.OrderDetailHandlers
             _repository = repository;
         }
 
-        public async Task UpdateOrderDetailCommandHandlerAsync(UpdateOrderDetailCommand command)
+        public async Task Handle(UpdateOrderDetailCommand command)
         {
             OrderDetail orderDetail = await _repository.GetByIdAsync(command.OrderDetailId);
             orderDetail.ProductAmount = command.ProductAmount;
