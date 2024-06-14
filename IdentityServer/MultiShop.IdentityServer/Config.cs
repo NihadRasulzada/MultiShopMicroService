@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 
+using IdentityServer4;
 using IdentityServer4.Models;
 using System.Collections.Generic;
 
@@ -9,50 +10,113 @@ namespace MultiShop.IdentityServer
 {
     public static class Config
     {
-        public static IEnumerable<IdentityResource> IdentityResources =>
-                   new IdentityResource[]
-                   {
-                new IdentityResources.OpenId(),
-                new IdentityResources.Profile(),
-                   };
-
-        public static IEnumerable<ApiScope> ApiScopes =>
-            new ApiScope[]
+        public static IEnumerable<ApiResource> ApiResources => new ApiResource[]
+        {
+            new ApiResource("ResourceCatalog")
             {
-                new ApiScope("scope1"),
-                new ApiScope("scope2"),
-            };
+                Scopes = { "CatalogFullPermission", "CatalogReadPermission" }
+            },
 
-        public static IEnumerable<Client> Clients =>
-            new Client[]
+            new ApiResource("ResourceDiscount")
             {
-                // m2m client credentials flow client
-                new Client
+                Scopes = { "DiscountFullPermission" }
+            },
+
+            new ApiResource("ResourceOrder")
+            {
+                Scopes = { "OrderFullPermission" }
+            },
+
+            new ApiResource(IdentityServerConstants.LocalApi.ScopeName)
+
+        };
+
+        public static IEnumerable<IdentityResource> IdentityResources => new IdentityResource[]
+        {
+            new IdentityResources.OpenId(),
+            new IdentityResources.Email(),
+            new IdentityResources.Profile()
+        };
+
+        public static IEnumerable<ApiScope> ApiScopes => new ApiScope[]
+        {
+            #region Catalog
+		    new ApiScope("CatalogFullPermission", "Full authority for catalog operations"),
+            new ApiScope("CatalogReadPermission", "Reading authority for catalog operations"), 
+	        #endregion
+
+            #region Discount
+		    new ApiScope("DiscountFullPermission", "Full authority for catalog operations"), 
+	        #endregion
+
+            #region Order
+		    new ApiScope("OrderFullPermission", "Full authority for catalog operations"), 
+	        #endregion
+
+            new ApiScope(IdentityServerConstants.LocalApi.ScopeName)
+        };
+
+        public static IEnumerable<Client> Clients => new Client[]
+        {
+            #region Vizitor
+		    new Client
+            {
+                ClientId = "MultiShopVisitorId",
+                ClientName = "Multi Shop Visitor User",
+                AllowedGrantTypes = GrantTypes.ClientCredentials,
+                ClientSecrets =
                 {
-                    ClientId = "m2m.client",
-                    ClientName = "Client Credentials Client",
-
-                    AllowedGrantTypes = GrantTypes.ClientCredentials,
-                    ClientSecrets = { new Secret("511536EF-F270-4058-80CA-1C89C192F69A".Sha256()) },
-
-                    AllowedScopes = { "scope1" }
+                    new Secret("MultiShopSecret".Sha256())
                 },
-
-                // interactive client using code flow + pkce
-                new Client
+                AllowedScopes =
                 {
-                    ClientId = "interactive",
-                    ClientSecrets = { new Secret("49C1A7E1-0C79-4A89-A3D6-A37998FB86B0".Sha256()) },
+                    "CatalogReadPermission"
+                }
+            }, 
+	        #endregion
 
-                    AllowedGrantTypes = GrantTypes.Code,
-
-                    RedirectUris = { "https://localhost:44300/signin-oidc" },
-                    FrontChannelLogoutUri = "https://localhost:44300/signout-oidc",
-                    PostLogoutRedirectUris = { "https://localhost:44300/signout-callback-oidc" },
-
-                    AllowOfflineAccess = true,
-                    AllowedScopes = { "openid", "profile", "scope2" }
+            #region Manager
+		    new Client
+            {
+                ClientId = "MultiShopManagerId",
+                ClientName = "Multi Shop Manager User",
+                AllowedGrantTypes = GrantTypes.ClientCredentials,
+                ClientSecrets =
+                {
+                    new Secret("MultiShopSecret".Sha256())
                 },
-            };
+                AllowedScopes =
+                {
+                    "CatalogReadPermission",
+                    "CatalogFullPermission"
+                }
+            }, 
+	        #endregion
+
+            #region Admin
+		    new Client
+            {
+                ClientId = "MultiShopAdminId",
+                ClientName = "Multi Shop Admin User",
+                AllowedGrantTypes = GrantTypes.ClientCredentials,
+                ClientSecrets =
+                {
+                    new Secret("MultiShopSecret".Sha256())
+                },
+                AllowedScopes =
+                {
+                    "CatalogReadPermission",
+                    "CatalogFullPermission",
+                    "DiscountFullPermission",
+                    "OrderFullPermission",
+                    IdentityServerConstants.LocalApi.ScopeName,
+                    IdentityServerConstants.StandardScopes.OpenId,
+                    IdentityServerConstants.StandardScopes.Email,
+                    IdentityServerConstants.StandardScopes.Profile
+                },
+                AccessTokenLifetime = 600 // 10 minutes
+            } 
+	        #endregion
+        };
     }
 }

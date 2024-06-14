@@ -27,7 +27,7 @@ namespace MultiShop.Catalog.Services.ProductDetailServices
 
         public async Task DeleteProductDetailAsync(string id)
         {
-            await _ProductDetailCollection.DeleteOneAsync(ProductDetail => ProductDetail.Id == id);
+            await _ProductDetailCollection.DeleteOneAsync(ProductDetail => ProductDetail.ProductDetailId == id);
         }
 
         public async Task<List<ResultProductDetailDto>> GetAllProductDetailAsync()
@@ -39,7 +39,7 @@ namespace MultiShop.Catalog.Services.ProductDetailServices
 
         public async Task<GetByIdProductDetailDto> GetByIdProductDetailAsync(string id)
         {
-            ProductDetail productDetail = await _ProductDetailCollection.Find<ProductDetail>(ProductDetail => ProductDetail.Id == id).FirstOrDefaultAsync();
+            ProductDetail productDetail = await _ProductDetailCollection.Find<ProductDetail>(ProductDetail => ProductDetail.ProductDetailId == id).FirstOrDefaultAsync();
             GetByIdProductDetailDto getByIdProductDetailDto = _mapper.Map<GetByIdProductDetailDto>(productDetail);
             return getByIdProductDetailDto;
         }
@@ -47,7 +47,7 @@ namespace MultiShop.Catalog.Services.ProductDetailServices
         public async Task UpdateProductDetailAsync(UpdateProductDetailDto updateProductDetailDto)
         {
             ProductDetail ProductDetail = _mapper.Map<ProductDetail>(updateProductDetailDto);
-            await _ProductDetailCollection.FindOneAndReplaceAsync(c => c.Id == updateProductDetailDto.ProductDetailId, ProductDetail);
+            await _ProductDetailCollection.FindOneAndReplaceAsync(c => c.ProductDetailId == updateProductDetailDto.ProductDetailId, ProductDetail);
         }
     }
 }
